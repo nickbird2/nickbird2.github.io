@@ -1,0 +1,168 @@
+---
+title: 'Project 1: Exploratory Data Analysis'
+author: "Nicholaus Bird, ntb485"
+date: 'April 4th,2021'
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+  pdf_document:
+    toc: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
+tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
+```
+
+
+I chose to use the datasets "nba_draft_2015" , "nba_draymond", and "nba_tattoos" off of the "thirtyfivethirty" online database. The "nba_draft_2015" dataset contains the names of player’s positions and a unique ID for each player. The "nba_draymond" dataset shows a calculated defensive rating which relies on how effective a player is at minimizing the "openness" of the opposite team. Lastly, I included the nba_tatoos dataset which is a categorical dataset that lists TRUE or FALSE depending on if the player has tattoos. I chose these datasets because I am an avid fan of the NBA and thought it would be interesting to find various correlations. I decided to add the tattoos dataset to see if tattoos correlate with a likelihood for better defense or higher projections during the draft. I  am also interested in seeing how accurate the projections were and how the amount of playing time correlates to defensive ability (ie the more minutes, the more tired a player could be which could lead to bad defense).
+
+The combined dataset contains 11 variables including:
+player-name
+Position- (PG,PF,SG,C,SF)
+draft_year-(2001-2015)
+superstar- likelihood they will become a "superstar"
+starter- likelihood they will start for their team
+role_player- likelihood they wioll become a role-player on their team
+bust-likelihood of busting/failing in NBA
+season-current season
+possessions- number of total possessions
+draymond- defensive rating
+tattoos- True/False
+
+
+```{R}
+
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(fivethirtyeight)
+library(reshape2)
+```
+
+```{R}
+draft <- nba_draft_2015
+draymond <- nba_draymond
+tatt <- nba_tattoos
+view(draft)
+view(draymond)
+view(tatt)
+draft %>% select(-projected_spm,-id)
+cleandraft <- draft %>% select(-projected_spm,-id)
+cleandraft %>% summarize_all(n_distinct)
+draymond %>% summarize_all(n_distinct)
+draftndray <- cleandraft %>% left_join(draymond)
+tatt %>% mutate(player= player_name)
+#so that the variable names would be the same for the join
+cleantatt <- tatt %>% mutate(player= player_name) %>% select(-player_name)
+combodata <- draftndray %>% left_join(cleantatt)
+#joining 3 datasets by the "player"
+view(combodata)
+nona <- combodata %>% na.omit()
+#to remove all rows with NA
+view(nona)
+nona %>% summarize_all(n_distinct)
+
+```
+
+After using joining the three datasets with left joins (to maintain the structure of the Draft data set), all of the rows that contained NA were removed and then saved as the dataset "nona". This dataset contains 1289 observations with 11 different variables. After summarizing all of the unique variables we see that there are 307 unique players left in the dataset across 6 different seasons and 14 different draft years. All of these players have data for projections, defense, tattoos, positions, and names. While joining the data sets, about 2/3 of the data was lost (778 out of the original 1085). This could cause issues when making claims about the entire NBA, however, this cleaner dataset contains more "well-known" names that may be more relevant yet constricting to the overall hypothesis.
+
+
+#Summary Statistics
+```{R}
+hope <- nona %>% group_by(draft_year, position) %>% summarize(mean_super = mean(superstar), mean_bust = mean(bust), total = n_distinct(player)) %>% arrange(-mean_super)
+
+combodata %>% group_by(draft_year, position) %>% summarize(mean_super = mean(superstar), mean_bust = mean(bust), total = n_distinct(player)) %>% arrange(-mean_super)
+
+
+library(kableExtra)
+todo <- nona
+todo1 <- todo %>% distinct(player, .keep_all = TRUE)
+todo1 %>% kbl() %>% kable_material_dark()
+
+sumto <- summary(todo1)
+sumto %>% kbl() %>% kable_material_dark()
+
+```
+ 
+the hope dataset shows the "hope" (average rating for becoming a superstar) for each NBA draft player. The data is organized by position and draft year and then arranged by descending Superstar probability. This way, it shows which class of incoming rookies was seen as most hopeful. these rankings were separated by incoming draft year as well as position to show which class was most promising. according to the data, the 2005 class of Small Forwards was most likely to contain a superstar with an average value of 0.0637 or a 6.37% chance of becoming a superstar. This class contained 5 different ballplayers including Joel Embiid (14.8%), Patric Young, Jordan Bachynski, Alex Kirk, and Alec Brown.
+The summary table shows the various summarizing statistics for each of the variables in the main data set. It describes the minimum, maximum, mean, quartile range, as well as the number of observations (length of player). 
+ 
+###Visualizations (three plots)
+```{R}
+cormat <- nona%>%select_if(is.numeric)%>%na.omit%>%cor%>%t
+library(reshape2)
+library(ggplot2)
+melted_cormat <- melt(cormat)
+
+ggplot(data = melted_cormat, aes(Var2, Var1, fill = value))+
+    geom_tile(color = "white")+
+    scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                         midpoint = 0, limit = c(-1,1), space = "Lab", 
+                         name="Correlation") +
+    theme_minimal()+ 
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                     size = 12, hjust = 1))+
+    coord_fixed() + ggtitle("Correlation Heatmap")
+
+```
+This correlation heat map shows the relationship between all of the numeric variables. According to the map, there is a fairly strong correlation between a projected superstar/starter, and the number of possessions played. While this makes intuitive sense, there was a negative correlation between the likeliness of becoming a "role-player" and playing more possessions in actuality. there was also a very small positive correlation between defensive ability and the number of possessions. It seems that the more possessions a player in the game, the higher the probability they will play slightly better defense(although it is small). 
+
+
+   
+```{R} 
+todo1 %>% ggplot(aes(x=draft_year, y=superstar, color=tattoos, shape=position)) + geom_point() + scale_color_ordinal() + ggtitle('Projected Perfomance by Draft Year')
+```
+This plot shows the projection of superstar status based on draft year, position, and the presence of TATTOOS. as shown by the graph, the peak year was 2008 in which the top prospect was a Point Guard with no tattoos. While the presence of tattoos does not seem to affect the overall superstar status, the top 5 prospects since 2001 did not have tattoos. The majority of the upper-middle prospects, however, were much more likely to have tattoos. This graph also shows that the top prospects favored point guards and power forwards.
+
+
+```{R}
+todo1 %>% ggplot(aes(position, possessions)) + geom_bar(stat = "identity") + facet_wrap(~draft_year) +theme_get() + ggtitle('Playing Time By Position (2001-2015)')
+
+```
+This plot shows the total playing time by position (ie which drafted positions got the most playing by draft year). This faceted bar plot shows which positions were most successful in the sense of the longevity of career. This plot separates these variables by draft year to be able to see which position was dominant according to the draft year (ie PG in 2011 draft year). For example, the drafting years from 2001-2006 had no prevalence of a dominant position. They also had relatively short careers when compared to the draft picks from 2009 and up. 
+
+```{R}
+```
+
+
+
+```{R}
+
+
+
+
+library(cluster)
+library(tidyverse)
+pamtot <- todo1%>% select(-draymond,-role_player) %>% pam(k=9)
+head(pamtot)
+
+todo1%>%ggplot(aes(bust,superstar)) + geom_point()+ ggtitle('PAM Plot')
+
+
+eig1 <- todo1%>% select(bust,superstar) %>% cor %>% eigen()
+
+C<-todo1 %>% select(bust,superstar) %>% cor
+D<-eig1$values*diag(c(1, 1)) 
+U<-eig1$vectors
+C
+D
+U
+eig1$vectors
+xy<-todo1 %>% select(bust,superstar) %>% as.matrix
+scores<-t(t(eig1$vectors)%*%t(xy)) %>% as.data.frame
+
+```
+
+<P style="page-break-before: always">
+\newpage
+
+
+
+
+...
+
+

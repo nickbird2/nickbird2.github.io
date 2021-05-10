@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Nicholaus Bird" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <title>Project 2: Modeling, Testing, and Predicting</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../post/">BLOG</a></li>
+        
+        <li><a href="../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../project/project2/">Project 2: Modeling, Testing, and Predicting</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The “nuke” dataset contains Stockholm International Peace Research Institute’s record of Nuclear Explosions From 1945–1998. This dataset lists the date and location of each explosion, the country responsible, the detonation site, and (where known) its explosive yield(energy released) , among other variables.</p>
+<p>year,country, region, source, lattitude, longitude, Seismic magnitude (mb), explosive yield,</p>
+</div>
+<div id="clean-data" class="section level1">
+<h1>Clean Data</h1>
+<pre class="r"><code>library(readr)
+library(tidyverse)
+sipri_report_explosions &lt;- read_csv(&quot;sipri-report-explosions.csv&quot;)
+
+nuke &lt;- sipri_report_explosions
+glimpse(nuke)</code></pre>
+<pre><code>## Rows: 2,051
+## Columns: 18
+## $ date      &lt;dbl&gt; 450716, 450805, 450809, 460630, 460724, 480414, 480430, 480…
+## $ origin_t  &lt;dbl&gt; 123000, 231500, 15800, 220100, 213500, 181700, 180900, 1804…
+## $ id_no     &lt;dbl&gt; 45001, 45002, 45003, 46001, 46002, 48001, 48002, 48003, 490…
+## $ country   &lt;chr&gt; &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;US…
+## $ region    &lt;chr&gt; &quot;ALAMOGORDO&quot;, &quot;HIROSHIMA&quot;, &quot;NAGASAKI&quot;, &quot;BIKINI&quot;, &quot;BIKINI&quot;, …
+## $ source    &lt;chr&gt; &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DO…
+## $ latitude  &lt;dbl&gt; 32.54, 34.23, 32.45, 11.35, 11.35, 11.30, 11.30, 11.30, 48.…
+## $ longitude &lt;dbl&gt; -105.57, 132.27, 129.52, 165.20, 165.20, 162.15, 162.15, 16…
+## $ mb        &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+## $ Ms        &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+## $ depth     &lt;dbl&gt; -0.100, -0.600, -0.600, -0.200, 0.030, -0.080, -0.080, -0.0…
+## $ yield_1   &lt;dbl&gt; 21.0, 15.0, 21.0, 21.0, 21.0, 37.0, 49.0, 18.0, 22.0, 1.0, …
+## $ yield_u   &lt;dbl&gt; 21.0, 15.0, 21.0, 21.0, 21.0, 37.0, 49.0, 18.0, 22.0, 1.0, …
+## $ purpose   &lt;chr&gt; &quot;WR&quot;, &quot;COMBAT&quot;, &quot;COMBAT&quot;, &quot;WE&quot;, &quot;WE&quot;, &quot;WR&quot;, &quot;WR&quot;, &quot;WR&quot;, &quot;WR…
+## $ name      &lt;chr&gt; &quot;TRINITY&quot;, &quot;LITTLEBOY&quot;, &quot;FATMAN&quot;, &quot;ABLE&quot;, &quot;BAKER&quot;, &quot;X-RAY&quot;,…
+## $ type      &lt;chr&gt; &quot;TOWER&quot;, &quot;AIRDROP&quot;, &quot;AIRDROP&quot;, &quot;AIRDROP&quot;, &quot;UW&quot;, &quot;TOWER&quot;, &quot;T…
+## $ date_long &lt;dbl&gt; 19450716, 19450805, 19450809, 19460630, 19460724, 19480414,…
+## $ year      &lt;dbl&gt; 1945, 1945, 1945, 1946, 1946, 1948, 1948, 1948, 1949, 1951,…</code></pre>
+<pre class="r"><code>nnuke &lt;- nuke %&gt;% select(-date_long, -id_no, -depth, -origin_t, 
+    -purpose, -Ms, -yield_u, -date)
+glimpse(nnuke)</code></pre>
+<pre><code>## Rows: 2,051
+## Columns: 10
+## $ country   &lt;chr&gt; &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;US…
+## $ region    &lt;chr&gt; &quot;ALAMOGORDO&quot;, &quot;HIROSHIMA&quot;, &quot;NAGASAKI&quot;, &quot;BIKINI&quot;, &quot;BIKINI&quot;, …
+## $ source    &lt;chr&gt; &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DO…
+## $ latitude  &lt;dbl&gt; 32.54, 34.23, 32.45, 11.35, 11.35, 11.30, 11.30, 11.30, 48.…
+## $ longitude &lt;dbl&gt; -105.57, 132.27, 129.52, 165.20, 165.20, 162.15, 162.15, 16…
+## $ mb        &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+## $ yield_1   &lt;dbl&gt; 21.0, 15.0, 21.0, 21.0, 21.0, 37.0, 49.0, 18.0, 22.0, 1.0, …
+## $ name      &lt;chr&gt; &quot;TRINITY&quot;, &quot;LITTLEBOY&quot;, &quot;FATMAN&quot;, &quot;ABLE&quot;, &quot;BAKER&quot;, &quot;X-RAY&quot;,…
+## $ type      &lt;chr&gt; &quot;TOWER&quot;, &quot;AIRDROP&quot;, &quot;AIRDROP&quot;, &quot;AIRDROP&quot;, &quot;UW&quot;, &quot;TOWER&quot;, &quot;T…
+## $ year      &lt;dbl&gt; 1945, 1945, 1945, 1946, 1946, 1948, 1948, 1948, 1949, 1951,…</code></pre>
+<pre class="r"><code>nnuke1 &lt;- nnuke %&gt;% filter(mb &gt; 0)
+
+nona &lt;- nnuke1 %&gt;% na.omit()
+nuke1 &lt;- nona</code></pre>
+</div>
+<div id="manova-test" class="section level1">
+<h1>MANOVA Test</h1>
+<pre class="r"><code>man &lt;- manova(cbind(mb, yield_1, year) ~ country, data = nuke1)
+summary(man)</code></pre>
+<pre><code>##            Df   Pillai approx F num Df den Df    Pr(&gt;F)    
+## country     4 0.082474   3.4205     12   1452 5.681e-05 ***
+## Residuals 484                                              
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>summary.aov(man)</code></pre>
+<pre><code>##  Response mb :
+##              Df  Sum Sq Mean Sq F value Pr(&gt;F)
+## country       4   0.721 0.18027  0.5419  0.705
+## Residuals   484 161.003 0.33265               
+## 
+##  Response yield_1 :
+##              Df  Sum Sq Mean Sq F value Pr(&gt;F)
+## country       4   69808   17452   1.011 0.4012
+## Residuals   484 8354990   17262               
+## 
+##  Response year :
+##              Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+## country       4  2048.3  512.08  9.6658 1.582e-07 ***
+## Residuals   484 25641.7   52.98                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>nuke1 %&gt;% group_by(country) %&gt;% summarize(min(year), mean(year), 
+    mean(yield_1), max(yield_1), mean(mb))</code></pre>
+<pre><code>## # A tibble: 5 x 6
+##   country `min(year)` `mean(year)` `mean(yield_1)` `max(yield_1)` `mean(mb)`
+##   &lt;chr&gt;         &lt;dbl&gt;        &lt;dbl&gt;           &lt;dbl&gt;          &lt;dbl&gt;      &lt;dbl&gt;
+## 1 FRANCE         1965        1979.            32.8         1000         5.1 
+## 2 INDIA          1998        1998              0              0         5.3 
+## 3 UK             1965        1982.            17.0           20.6       5.13
+## 4 USA            1957        1976.            41.8         1300         5.04
+## 5 USSR           1965        1979.            11.2          140         5.13</code></pre>
+<pre class="r"><code>pairwise.t.test(nuke1$mb, nuke1$country, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  nuke1$mb and nuke1$country 
+## 
+##       FRANCE INDIA UK USA
+## INDIA -      -     -  -  
+## UK    -      -     -  -  
+## USA   -      -     -  -  
+## USSR  -      -     -  -  
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code># Bonferroni Correction sig/test
+0.05/4</code></pre>
+<pre><code>## [1] 0.0125</code></pre>
+<pre class="r"><code># 0.0125
+
+
+# type 1 error Probability
+1 - (0.95^4)</code></pre>
+<pre><code>## [1] 0.1854938</code></pre>
+<pre class="r"><code># 0.1854938</code></pre>
+<p>A one-way MANOVA test was conducted to determine the effect of the Country of origin on year, explosive yield, and seismic magnitude (mb) (1-10). According to the MANOVA, there was a significant difference found for each country (Pillai trace= 0.25404, approxF= 31.918, p &lt; 2.2e-16). The univariate ANOVA test for year and seismic magnitude (mb) was found to be significant (p &lt; 2.2e-16) while the explosive yield was not (p=0.1333). The different countries nuclear explosioins differ in year and seismic magnitude but not explosive yield.
+1 MANOVA and 3 ANOVA tests were conducted. The un-adjusted probability of a type one error was 0.1854938 with a Bonferroni corrected significance level of 0.05/4 (0.0125). Including the correction, the year and mb are still significant according to the country of origin although it is unlikely that all assumptions were met.</p>
+</div>
+<div id="randomization" class="section level1">
+<h1>Randomization</h1>
+<pre class="r"><code>yield &lt;- nuke1 %&gt;% select(country, yield_1)
+glimpse(yield)</code></pre>
+<pre><code>## Rows: 489
+## Columns: 2
+## $ country &lt;chr&gt; &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;…
+## $ yield_1 &lt;dbl&gt; 1.700, 0.072, 5.000, 1.300, 2.600, 0.000, 13.400, 3.000, 0.50…</code></pre>
+<pre class="r"><code>ggplot(yield, aes(yield_1, fill = country)) + geom_histogram(bins = 6.5) + 
+    facet_wrap(~country, ncol = 2)  #Explosive Yield by Country</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(nuke1, aes(mb, fill = country)) + geom_histogram(bins = 6.5) + 
+    facet_wrap(~country, ncol = 2)  #mb by Country</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>nuke1 %&gt;% group_by(country) %&gt;% summarize(means = mean(mb))</code></pre>
+<pre><code>## # A tibble: 5 x 2
+##   country means
+##   &lt;chr&gt;   &lt;dbl&gt;
+## 1 FRANCE   5.1 
+## 2 INDIA    5.3 
+## 3 UK       5.13
+## 4 USA      5.04
+## 5 USSR     5.13</code></pre>
+<pre class="r"><code>nuke1 %&gt;% group_by(country) %&gt;% summarize(means = mean(mb)) %&gt;% 
+    summarize(mean_diff = diff(means))</code></pre>
+<pre><code>## # A tibble: 4 x 1
+##   mean_diff
+##       &lt;dbl&gt;
+## 1    0.2   
+## 2   -0.170 
+## 3   -0.0859
+## 4    0.0884</code></pre>
+<pre class="r"><code># USA
+rand_dist &lt;- vector()
+for (i in 1:5000) {
+    new &lt;- data.frame(mb = sample(nuke1$mb), country = nuke1$country)
+    rand_dist[i] &lt;- mean(new[new$country == &quot;USA&quot;, ]$mb)
+    mean(new[new$condition == &quot;USA&quot;, ]$mb)
+}
+
+{
+    hist(rand_dist, main = &quot;Distribution of Siesmic Magnitude (USA)&quot;, 
+        ylab = &quot;count&quot;)
+    abline(v = 1.48, col = &quot;red&quot;)
+}</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># USSR
+rand_dist &lt;- vector()
+for (i in 1:5000) {
+    new &lt;- data.frame(mb = sample(nuke1$mb), country = nuke1$country)
+    rand_dist[i] &lt;- mean(new[new$country == &quot;USSR&quot;, ]$mb)
+    mean(new[new$condition == &quot;USSR&quot;, ]$mb)
+}
+
+{
+    hist(rand_dist, main = &quot;histogram of random distribution (USSR) &quot;, 
+        ylab = &quot;count&quot;)
+}</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-3-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># FRANCE
+rand_dist &lt;- vector()
+for (i in 1:5000) {
+    new &lt;- data.frame(mb = sample(nuke1$mb), country = nuke1$country)
+    rand_dist[i] &lt;- mean(new[new$country == &quot;FRANCE&quot;, ]$mb)
+    mean(new[new$condition == &quot;FRANCE&quot;, ]$mb)
+}
+
+{
+    hist(rand_dist, main = &quot;histogram of random distribution (FRANCE) &quot;, 
+        ylab = &quot;count&quot;)
+}</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-3-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># INDIA
+rand_dist &lt;- vector()
+for (i in 1:5000) {
+    new &lt;- data.frame(mb = sample(nuke1$mb), country = nuke1$country)
+    rand_dist[i] &lt;- mean(new[new$country == &quot;INDIA&quot;, ]$mb)
+    mean(new[new$condition == &quot;INDIA&quot;, ]$mb)
+}
+
+{
+    hist(rand_dist, main = &quot;histogram of random distribution (INDIA) &quot;, 
+        ylab = &quot;count&quot;)
+}</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-3-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># UK
+rand_dist &lt;- vector()
+for (i in 1:5000) {
+    new &lt;- data.frame(mb = sample(nuke1$mb), country = nuke1$country)
+    rand_dist[i] &lt;- mean(new[new$country == &quot;UK&quot;, ]$mb)
+    mean(new[new$condition == &quot;UK&quot;, ]$mb)
+}
+
+{
+    hist(rand_dist, main = &quot;histogram of random distribution (UK) &quot;, 
+        ylab = &quot;count&quot;)
+}</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-3-7.png" width="672" style="display: block; margin: auto;" />
+Null Hypothesis: The explosive yield and mb (size/effect of the explosion) are the same across different countries</p>
+<p>Alternative Hypothesis: The explosive yield and mb (size/effect of the explosion) differ across different countries</p>
+<p>Based on this hypothesis, we f reject the null hypothesis that all of the countries have the same impact on seismic magnitudes</p>
+</div>
+<div id="linear-regression" class="section level1">
+<h1>Linear Regression</h1>
+<pre class="r"><code>nuke1$latitude &lt;- nuke1$latitude - mean(nuke1$latitude)
+nuke1$longitude &lt;- nuke1$longitude - mean(nuke1$longitude)
+
+fit &lt;- lm(mb ~ latitude + longitude, data = nuke1)
+summary(fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mb ~ latitude + longitude, data = nuke1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.54172 -0.37850 -0.00131  0.45838  1.54075 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  5.0701431  0.0259784 195.168   &lt;2e-16 ***
+## latitude    -0.0006860  0.0013858  -0.495   0.6208    
+## longitude    0.0007708  0.0004001   1.927   0.0546 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.5745 on 486 degrees of freedom
+## Multiple R-squared:  0.008266,   Adjusted R-squared:  0.004185 
+## F-statistic: 2.025 on 2 and 486 DF,  p-value: 0.1331</code></pre>
+<pre class="r"><code>ggplot(nuke1, aes(y = longitude, x = latitude, color = mb)) + 
+    geom_point() + stat_smooth(method = &quot;lm&quot;, se = FALSE)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(nuke1, aes(y = mb, x = longitude)) + geom_point() + stat_smooth(method = &quot;lm&quot;, 
+    se = FALSE)  #mb for every 1 unit Longitude </code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(nuke1, aes(y = mb, x = latitude)) + geom_point() + stat_smooth(method = &quot;lm&quot;, 
+    se = FALSE)  #mb for every 1 unit Latitude </code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>qqnorm(nuke1$latitude)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>qqnorm(nuke1$longitude)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-4-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>summary(fit)$r.sq</code></pre>
+<pre><code>## [1] 0.008265783</code></pre>
+<pre class="r"><code>library(lmtest)
+library(sandwich)
+bptest(fit)</code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  fit
+## BP = 9.4093, df = 2, p-value = 0.009053</code></pre>
+<pre class="r"><code>coeftest(fit, vcov = vcovHC(fit))</code></pre>
+<pre><code>## 
+## t test of coefficients:
+## 
+##                Estimate  Std. Error  t value Pr(&gt;|t|)    
+## (Intercept)  5.07014315  0.02603693 194.7289  &lt; 2e-16 ***
+## latitude    -0.00068599  0.00125627  -0.5461  0.58528    
+## longitude    0.00077083  0.00039465   1.9532  0.05137 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>ffit &lt;- lm(mb ~ latitude, data = nuke1)  #effect of latitude
+summary(ffit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mb ~ latitude, data = nuke1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.57288 -0.37301  0.02692  0.42695  1.71711 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 5.0701431  0.0260506  194.63   &lt;2e-16 ***
+## latitude    0.0006908  0.0011907    0.58    0.562    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.5761 on 487 degrees of freedom
+## Multiple R-squared:  0.0006907,  Adjusted R-squared:  -0.001361 
+## F-statistic: 0.3366 on 1 and 487 DF,  p-value: 0.5621</code></pre>
+<pre class="r"><code>fffit &lt;- lm(mb ~ longitude, data = nuke1)  #effect of latitude
+summary(fffit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mb ~ longitude, data = nuke1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.54784 -0.38590  0.00051  0.45221  1.55482 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 5.0701431  0.0259583 195.319   &lt;2e-16 ***
+## longitude   0.0006687  0.0003425   1.952   0.0515 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.574 on 487 degrees of freedom
+## Multiple R-squared:  0.007766,   Adjusted R-squared:  0.005728 
+## F-statistic: 3.812 on 1 and 487 DF,  p-value: 0.05147</code></pre>
+<p>It was observed that for every one unit increase in magnitude (mb), Latitude decreases by 0.0006860 (p= 0.6208) while longitude increased by 0.0007708 (p=0.0546 ). The bp test returned a p value of 0.009053 which indicates that heteroscedasticity does not exist. The chi sq test revealed that this model accounts for 0.008265783 of the total variation. Based on this data we fail to reject the null hypothesis that that long/lat affect the seismic magnitude of an explosion.</p>
+</div>
+<div id="linear-regression-with-interaction" class="section level1">
+<h1>Linear Regression (With Interaction)</h1>
+<pre class="r"><code>newnuke1 &lt;- nuke1 %&gt;% select(mb, longitude, latitude)
+view(newnuke1)
+
+fitt &lt;- lm(mb ~ latitude * longitude, data = newnuke1)
+sd1 &lt;- newnuke1[sample(nrow(newnuke1), replace = TRUE), ]
+
+sample_dist &lt;- replicate(1000, {
+    sd1 &lt;- newnuke1[sample(nrow(newnuke1), replace = TRUE), ]
+    fittt &lt;- lm(mb ~ latitude * longitude, data = sd1)
+    coef(fittt)
+})
+
+summary(fitt)  #uncorrected</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mb ~ latitude * longitude, data = newnuke1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.53771 -0.39978 -0.03529  0.46236  1.56181 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)        5.045e+00  3.187e-02 158.306   &lt;2e-16 ***
+## latitude           5.116e-04  1.637e-03   0.313    0.755    
+## longitude          1.555e-04  6.009e-04   0.259    0.796    
+## latitude:longitude 2.965e-05  2.163e-05   1.371    0.171    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.5739 on 485 degrees of freedom
+## Multiple R-squared:  0.0121, Adjusted R-squared:  0.005985 
+## F-statistic: 1.979 on 3 and 485 DF,  p-value: 0.1162</code></pre>
+<pre class="r"><code>coeftest(fitt, vcov = vcovHC(fitt))  #corrected</code></pre>
+<pre><code>## 
+## t test of coefficients:
+## 
+##                      Estimate Std. Error  t value Pr(&gt;|t|)    
+## (Intercept)        5.0448e+00 3.1429e-02 160.5160  &lt; 2e-16 ***
+## latitude           5.1162e-04 1.4310e-03   0.3575  0.72085    
+## longitude          1.5552e-04 5.6814e-04   0.2737  0.78441    
+## latitude:longitude 2.9654e-05 1.7430e-05   1.7014  0.08952 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>It was observed that the p values and the Std. Error for the uncorected SE’s are higher than the values for the corrected SE’s.</p>
+</div>
+<div id="logistic-regression-model" class="section level1">
+<h1>Logistic Regression Model</h1>
+<pre class="r"><code>library(plotROC)
+
+nuke1$Binary &lt;- ifelse(nuke1$country == &quot;USA&quot;, 1, 0)
+glimpse(nuke1)</code></pre>
+<pre><code>## Rows: 489
+## Columns: 11
+## $ country   &lt;chr&gt; &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;USA&quot;, &quot;US…
+## $ region    &lt;chr&gt; &quot;NTS&quot;, &quot;NTS&quot;, &quot;NTS&quot;, &quot;NTS&quot;, &quot;NTS&quot;, &quot;NTS&quot;, &quot;NTS&quot;, &quot;CARLSBAD …
+## $ source    &lt;chr&gt; &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DOE&quot;, &quot;DO…
+## $ latitude  &lt;dbl&gt; 3.9550409, 3.9550409, 3.9550409, 3.9550409, 3.9550409, 3.95…
+## $ longitude &lt;dbl&gt; -33.35105, -33.35105, -33.35105, -33.35105, -33.35105, -33.…
+## $ mb        &lt;dbl&gt; 4.1, 2.6, 4.4, 4.8, 4.4, 2.5, 4.3, 4.6, 3.4, 3.5, 4.3, 4.9,…
+## $ yield_1   &lt;dbl&gt; 1.700, 0.072, 5.000, 1.300, 2.600, 0.000, 13.400, 3.000, 0.…
+## $ name      &lt;chr&gt; &quot;RAINIER&quot;, &quot;TAMALPAIS&quot;, &quot;LOGAN&quot;, &quot;SANTA FE&quot;, &quot;ANTLER&quot;, &quot;SHR…
+## $ type      &lt;chr&gt; &quot;TUNNEL&quot;, &quot;TUNNEL&quot;, &quot;TUNNEL&quot;, &quot;BALLOON&quot;, &quot;TUNNEL&quot;, &quot;SHAFT&quot;,…
+## $ year      &lt;dbl&gt; 1957, 1958, 1958, 1958, 1961, 1961, 1961, 1961, 1961, 1961,…
+## $ Binary    &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…</code></pre>
+<pre class="r"><code>fittt &lt;- glm(Binary ~ year + yield_1, data = nuke1, family = &quot;binomial&quot;)
+coeftest(fittt)</code></pre>
+<pre><code>## 
+## z test of coefficients:
+## 
+##                Estimate  Std. Error z value  Pr(&gt;|z|)    
+## (Intercept) 139.1154258  28.1180846  4.9475 7.516e-07 ***
+## year         -0.0700177   0.0142107 -4.9271 8.346e-07 ***
+## yield_1       0.0011341   0.0012121  0.9357    0.3494    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>exp(coef(fittt))</code></pre>
+<pre><code>##  (Intercept)         year      yield_1 
+## 2.612533e+60 9.323773e-01 1.001135e+00</code></pre>
+<pre class="r"><code>nuke1$probability &lt;- predict(fittt, type = &quot;response&quot;)
+
+table(predict = as.numeric(nuke1$probability &gt; 0.5), truth = nuke1$Binary) %&gt;% 
+    addmargins()</code></pre>
+<pre><code>##        truth
+## predict   0   1 Sum
+##     0    10  25  35
+##     1   155 299 454
+##     Sum 165 324 489</code></pre>
+<pre class="r"><code># TNR = 0.9228395
+299/324</code></pre>
+<pre><code>## [1] 0.9228395</code></pre>
+<pre class="r"><code># TPR = 0.06060606
+10/165</code></pre>
+<pre><code>## [1] 0.06060606</code></pre>
+<pre class="r"><code># PPV = 0.6585903
+299/454</code></pre>
+<pre><code>## [1] 0.6585903</code></pre>
+<pre class="r"><code>pca1 &lt;- princomp(nuke1[c(&quot;year&quot;, &quot;mb&quot;)])
+nuke1$predictor &lt;- pca1$scores[, 1]
+ggplot(nuke1, aes(predictor, probability)) + geom_point(aes(color = country), 
+    alpha = 0.5, size = 4)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(nuke1) + geom_density(aes(probability, fill = Binary)) + 
+    xlab(&quot;logit&quot;)  #Density Plot (Log odds x Binary)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>sens &lt;- function(p, data = nuke1, y = Binary) mean(nuke1[nuke1$Binary == 
+    1, ]$probability &gt; p)
+spec &lt;- function(p, data = nuke1, y = Binary) mean(nuke1[nuke1$Binary == 
+    0, ]$probability &lt; p)
+
+sensitivity &lt;- sapply(seq(0, 1, 0.01), sens, nuke1)
+specificity &lt;- sapply(seq(0, 1, 0.01), spec, nuke1)
+ROC1 &lt;- data.frame(sensitivity, specificity, cutoff = seq(0, 
+    1, 0.01))
+ROC1 %&gt;% gather(key, rate, -cutoff) %&gt;% ggplot(aes(cutoff, rate, 
+    color = key)) + geom_path() + geom_vline(xintercept = c(0.1, 
+    0.5), lty = 2, color = &quot;gray50&quot;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-6-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ROC1$TPR &lt;- sensitivity
+ROC1$FPR &lt;- 1 - specificity
+ROC1 %&gt;% ggplot(aes(FPR, TPR)) + geom_path(size = 1.5) + geom_segment(aes(x = 0, 
+    y = 0, xend = 1, yend = 1), lty = 2) + scale_x_continuous(limits = c(0, 
+    1))</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-6-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ROCplot &lt;- ggplot(nuke1) + geom_roc(aes(d = Binary, m = predictor), 
+    n.cuts = 0)
+calc_auc(ROCplot)</code></pre>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.3576506</code></pre>
+<pre class="r"><code>class_diag &lt;- function(probs, truth) {
+
+    tab &lt;- table(factor(probs &gt; 0.5, levels = c(&quot;FALSE&quot;, &quot;TRUE&quot;)), 
+        truth)
+    acc = sum(diag(tab))/sum(tab)
+    sens = tab[2, 2]/colSums(tab)[2]
+    spec = tab[1, 1]/colSums(tab)[1]
+    ppv = tab[2, 2]/rowSums(tab)[2]
+
+    if (is.numeric(truth) == FALSE &amp; is.logical(truth) == FALSE) 
+        truth &lt;- as.numeric(truth) - 1
+
+    # CALCULATE EXACT AUC
+    ord &lt;- order(probs, decreasing = TRUE)
+    probs &lt;- probs[ord]
+    truth &lt;- truth[ord]
+
+    TPR = cumsum(truth)/max(1, sum(truth))
+    FPR = cumsum(!truth)/max(1, sum(!truth))
+
+    dup &lt;- c(probs[-1] &gt;= probs[-length(probs)], FALSE)
+    TPR &lt;- c(0, TPR[!dup], 1)
+    FPR &lt;- c(0, FPR[!dup], 1)
+
+    n &lt;- length(TPR)
+    auc &lt;- sum(((TPR[-1] + TPR[-n])/2) * (FPR[-1] - FPR[-n]))
+
+    data.frame(acc, sens, spec, ppv, auc)
+}
+
+k = 10
+data1 &lt;- nuke1[sample(nrow(nuke1)), ]
+folds &lt;- cut(seq(1:nrow(nuke1)), breaks = k, labels = F)
+
+diags &lt;- NULL
+for (i in 1:k) {
+    train &lt;- data1[folds != i, ]
+    test &lt;- data1[folds == i, ]
+    truth &lt;- test$Binary
+    fit5 &lt;- glm(Binary ~ year + yield_1, data = nuke1, family = &quot;binomial&quot;)
+    probs &lt;- predict(fit5, newdata = test, type = &quot;response&quot;)
+    diags &lt;- rbind(diags, class_diag(probs, truth))
+}
+
+apply(diags, 2, mean)</code></pre>
+<pre><code>##        acc       sens       spec        ppv        auc 
+## 0.63193027 0.92423693 0.06185046 0.65928648 0.63928303</code></pre>
+<pre class="r"><code># acc sens spec ppv auc 0.63201531 0.92326200 0.06015146
+# 0.65858885 0.64767851</code></pre>
+<p>The TNR was found to be 0.9228395 and the TPR was 0.06060606. These values indicate that the madel wad fairly good at indicating wether or not the origin of the bomb was the USA. The PPV was found to be 0.6585903 which is the proportion of the data that was correctly predicted to be from the ‘USA’.
+The AUC value was found to be 0.64767851 which means the model is ‘fair’ at predicting the that the bomb was from the USA.The calculated values for accuracy, sensitivity , specificity, ppv and auc are all as shown below.</p>
+<p>#acc sens spec ppv auc
+#0.63201531 0.92326200 0.06015146 0.65858885 0.64767851</p>
+</div>
+<div id="lasso-regression" class="section level1">
+<h1>LASSO Regression</h1>
+<pre class="r"><code>library(glmnet)
+fit6 &lt;- glm(Binary ~ mb + yield_1 + latitude + longitude, data = nuke1, 
+    family = binomial)
+
+x &lt;- model.matrix(fit6)
+y &lt;- as.matrix(nuke1$Binary)
+
+cv &lt;- cv.glmnet(x, y, family = &quot;binomial&quot;)
+lasso &lt;- glmnet(x, y, family = &quot;binomial&quot;, lambda = cv$lambda.1se)
+coef(lasso)</code></pre>
+<pre><code>## 6 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                      s0
+## (Intercept)  0.81209168
+## (Intercept)  .         
+## mb           .         
+## yield_1      .         
+## latitude     0.04909978
+## longitude   -0.02065814</code></pre>
+<pre class="r"><code>prob11 &lt;- predict(lasso, newx = x, type = &quot;response&quot;)
+class_diag(prob11, nuke1$Binary)</code></pre>
+<pre><code>##         acc      sens      spec       ppv       auc
+## 1 0.9406953 0.9753086 0.8727273 0.9376855 0.9089693</code></pre>
+<pre class="r"><code># acc=0.9406953 sens=0.9753086 spec=0.8727273 ppv=0.9376855
+# auc=0.9089693
+
+k = 10
+data2 &lt;- nuke1[sample(nrow(nuke1)), ]
+folds2 &lt;- cut(seq(1:nrow(nuke1)), breaks = k, labels = F)
+
+diags &lt;- NULL
+for (i in 1:k) {
+    train &lt;- data2[folds2 != i, ]
+    test &lt;- data2[folds2 == i, ]
+    truth &lt;- test$Binary
+    fit &lt;- glm(Binary ~ mb + yield_1 + latitude + longitude, 
+        data = train, family = &quot;binomial&quot;)
+    probs12 &lt;- predict(fit, newdata = test, type = &quot;response&quot;)
+    diags &lt;- rbind(diags, class_diag(probs12, truth))
+}
+
+apply(diags, 2, mean)</code></pre>
+<pre><code>##       acc      sens      spec       ppv       auc 
+## 0.9365221 0.9742167 0.8664616 0.9296362 0.9072185</code></pre>
+<pre class="r"><code># acc sens spec ppv auc 0.9366497 0.9722831 0.8559121
+# 0.9296818 0.9040297
+summary(fit6)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Binary ~ mb + yield_1 + latitude + longitude, family = binomial, 
+##     data = nuke1)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.3091  -0.3844   0.3944   0.4199   3.7810  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  1.905519   1.585745   1.202   0.2295    
+## mb          -0.220434   0.312525  -0.705   0.4806    
+## yield_1      0.002895   0.001414   2.047   0.0407 *  
+## latitude     0.094558   0.009279  10.191   &lt;2e-16 ***
+## longitude   -0.035526   0.002839 -12.513   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 625.25  on 488  degrees of freedom
+## Residual deviance: 272.67  on 484  degrees of freedom
+## AIC: 282.67
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<pre class="r"><code># Residual deviance: 272.67</code></pre>
+<p>The longitude,latitude,mb, and yield_1 variables were retained. The accuracy, specificity, sensitivity ,ppv, ad AUC are all higher when compared to the logistic regression. The model was found to have a Null deviance of 625.25 and a residual standard error of 272.67</p>
+<P style="page-break-before: always">
+<div style="page-break-after: always;"></div>
+<p>…</p>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../js/docs.min.js"></script>
+<script src="../../js/main.js"></script>
+
+<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

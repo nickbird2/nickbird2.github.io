@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Nicholaus Bird</title>
+    <link>/</link>
+    <description>Recent content on Nicholaus Bird</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Sun, 09 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Blog Post</title>
+      <link>/post/2021/05/09/blog-post/</link>
+      <pubDate>Sun, 09 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2021/05/09/blog-post/</guid>
+      <description>it worked i guess
+Link to project 1
+Link to google</description>
+    </item>
+    
+    <item>
+      <title>Hello R Markdown</title>
+      <link>/post/2015/07/23/hello-r-markdown/</link>
+      <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
+      
+      <guid>/post/2015/07/23/hello-r-markdown/</guid>
+      <description>R Markdown This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
+You can embed an R code chunk like this:
+summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.98 ## 3rd Qu.</description>
+    </item>
+    
+    <item>
+      <title>Project 1: Exploratory Data Analysis</title>
+      <link>/project/project1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project1/</guid>
+      <description>I chose to use the datasets “nba_draft_2015” , “nba_draymond”, and “nba_tattoos” off of the “thirtyfivethirty” online database. The “nba_draft_2015” dataset contains the names of player’s positions and a unique ID for each player. The “nba_draymond” dataset shows a calculated defensive rating which relies on how effective a player is at minimizing the “openness” of the opposite team. Lastly, I included the nba_tatoos dataset which is a categorical dataset that lists TRUE or FALSE depending on if the player has tattoos.</description>
+    </item>
+    
+    <item>
+      <title>Project 2: Modeling, Testing, and Predicting</title>
+      <link>/project/project2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project2/</guid>
+      <description>Introduction The “nuke” dataset contains Stockholm International Peace Research Institute’s record of Nuclear Explosions From 1945–1998. This dataset lists the date and location of each explosion, the country responsible, the detonation site, and (where known) its explosive yield(energy released) , among other variables.
+year,country, region, source, lattitude, longitude, Seismic magnitude (mb), explosive yield,
+ Clean Data library(readr) library(tidyverse) sipri_report_explosions &amp;lt;- read_csv(&amp;quot;sipri-report-explosions.csv&amp;quot;) nuke &amp;lt;- sipri_report_explosions glimpse(nuke) ## Rows: 2,051 ## Columns: 18 ## $ date &amp;lt;dbl&amp;gt; 450716, 450805, 450809, 460630, 460724, 480414, 480430, 480… ## $ origin_t &amp;lt;dbl&amp;gt; 123000, 231500, 15800, 220100, 213500, 181700, 180900, 1804… ## $ id_no &amp;lt;dbl&amp;gt; 45001, 45002, 45003, 46001, 46002, 48001, 48002, 48003, 490… ## $ country &amp;lt;chr&amp;gt; &amp;quot;USA&amp;quot;, &amp;quot;USA&amp;quot;, &amp;quot;USA&amp;quot;, &amp;quot;USA&amp;quot;, &amp;quot;USA&amp;quot;, &amp;quot;USA&amp;quot;, &amp;quot;USA&amp;quot;, &amp;quot;USA&amp;quot;, &amp;quot;US… ## $ region &amp;lt;chr&amp;gt; &amp;quot;ALAMOGORDO&amp;quot;, &amp;quot;HIROSHIMA&amp;quot;, &amp;quot;NAGASAKI&amp;quot;, &amp;quot;BIKINI&amp;quot;, &amp;quot;BIKINI&amp;quot;, … ## $ source &amp;lt;chr&amp;gt; &amp;quot;DOE&amp;quot;, &amp;quot;DOE&amp;quot;, &amp;quot;DOE&amp;quot;, &amp;quot;DOE&amp;quot;, &amp;quot;DOE&amp;quot;, &amp;quot;DOE&amp;quot;, &amp;quot;DOE&amp;quot;, &amp;quot;DOE&amp;quot;, &amp;quot;DO… ## $ latitude &amp;lt;dbl&amp;gt; 32.</description>
+    </item>
+    
+    <item>
+      <title>Projects</title>
+      <link>/projects/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/</guid>
+      <description> Check out some of my coding projects below:
+ Wrangling &amp;amp; Exploratory Data Analysis
+ Modeling, Inference, Prediction
+  -- </description>
+    </item>
+    
+    <item>
+      <title>Resume</title>
+      <link>/resume/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/resume/</guid>
+      <description>    </description>
+    </item>
+    
+  </channel>
+</rss>

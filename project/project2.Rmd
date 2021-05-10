@@ -1,0 +1,364 @@
+---
+title: 'Project 2: Modeling, Testing, and Predicting'
+author: "Nicholaus Bird, ntb485"
+date: 'May 7th,2021'
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+  pdf_document:
+    toc: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
+tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
+```
+
+#   Introduction
+The "nuke" dataset contains Stockholm International Peace Research Institute’s record of Nuclear Explosions From 1945–1998. This dataset lists the date and location of each explosion, the country responsible, the detonation site, and (where known) its explosive yield(energy released) , among other variables.
+
+year,country, region, source, lattitude, longitude, Seismic magnitude (mb), explosive yield, 
+
+#   Clean Data
+```{R}
+
+library(readr)
+library(tidyverse)
+sipri_report_explosions <- read_csv("sipri-report-explosions.csv")
+
+nuke <- sipri_report_explosions
+glimpse(nuke)
+nnuke <- nuke %>% select(-date_long,-id_no,-depth,-origin_t, -purpose,-Ms,-yield_u,-date)
+glimpse(nnuke)
+
+nnuke1 <- nnuke %>% filter(mb>0)
+
+nona <- nnuke1 %>% na.omit()
+nuke1 <- nona
+```
+#   MANOVA Test
+```{R}
+
+man <- manova(cbind(mb,yield_1,year)~country,data=nuke1)
+summary(man)
+summary.aov(man)
+
+
+nuke1 %>% group_by(country) %>% summarize(min(year), mean(year), mean(yield_1), max(yield_1), mean(mb))
+
+
+pairwise.t.test(nuke1$mb,nuke1$country, p.adj="none")
+
+#Bonferroni Correction sig/test
+0.05/4
+#0.0125
+
+
+#type 1 error Probability
+1 - (0.95^4)
+#0.1854938
+
+```
+A one-way MANOVA test was conducted to determine the effect of the Country of origin on year, explosive yield, and seismic magnitude (mb) (1-10). According to the MANOVA, there was a significant difference found for each country (Pillai trace= 0.25404, approxF= 31.918, p < 2.2e-16). The univariate ANOVA test for year and seismic magnitude (mb) was found to be significant (p < 2.2e-16)  while the explosive yield was not (p=0.1333). The different countries nuclear explosioins differ in year and seismic magnitude but not explosive yield.
+1 MANOVA and 3 ANOVA tests were conducted. The un-adjusted probability of a type one error was 0.1854938 with a Bonferroni corrected significance level of 0.05/4 (0.0125). Including the correction, the year and mb are still significant according to the country of origin although it is unlikely that all assumptions were met.
+
+#   Randomization
+```{R}
+yield<-nuke1 %>% select(country, yield_1)
+glimpse(yield)
+
+ggplot(yield,aes(yield_1,fill=country))+geom_histogram(bins=6.5)+facet_wrap(~country,ncol=2) #Explosive Yield by Country
+ggplot(nuke1,aes(mb,fill=country))+geom_histogram(bins=6.5)+facet_wrap(~country,ncol=2) #mb by Country
+
+
+nuke1 %>% group_by(country) %>% summarize(means=mean(mb))
+nuke1 %>% group_by(country) %>% summarize(means=mean(mb)) %>% summarize(mean_diff=diff(means))
+
+
+#USA
+rand_dist<-vector() 
+for(i in 1:5000){
+  new<-data.frame(mb=sample(nuke1$mb),country=nuke1$country)
+  rand_dist[i]<-mean(new[new$country=="USA",]$mb)
+  mean(new[new$condition=="USA",]$mb)}
+
+{hist(rand_dist, main = "Distribution of Siesmic Magnitude (USA)", ylab = "count"); abline(v=1.48, col="red")}
+
+#USSR
+rand_dist<-vector() 
+for(i in 1:5000){
+  new<-data.frame(mb=sample(nuke1$mb),country=nuke1$country)
+  rand_dist[i]<-mean(new[new$country=="USSR",]$mb)
+  mean(new[new$condition=="USSR",]$mb)}
+
+{hist(rand_dist, main = "histogram of random distribution (USSR) ", ylab = "count")}
+
+#FRANCE
+rand_dist<-vector() 
+for(i in 1:5000){
+  new<-data.frame(mb=sample(nuke1$mb),country=nuke1$country)
+  rand_dist[i]<-mean(new[new$country=="FRANCE",]$mb)
+  mean(new[new$condition=="FRANCE",]$mb)}
+
+{hist(rand_dist, main = "histogram of random distribution (FRANCE) ", ylab = "count")}
+
+#INDIA
+rand_dist<-vector() 
+for(i in 1:5000){
+  new<-data.frame(mb=sample(nuke1$mb),country=nuke1$country)
+  rand_dist[i]<-mean(new[new$country=="INDIA",]$mb)
+  mean(new[new$condition=="INDIA",]$mb)}
+
+{hist(rand_dist, main = "histogram of random distribution (INDIA) ", ylab = "count")}
+
+#UK
+rand_dist<-vector() 
+for(i in 1:5000){
+  new<-data.frame(mb=sample(nuke1$mb),country=nuke1$country)
+  rand_dist[i]<-mean(new[new$country=="UK",]$mb)
+  mean(new[new$condition=="UK",]$mb)}
+
+{hist(rand_dist, main = "histogram of random distribution (UK) ", ylab = "count")}
+
+```
+Null Hypothesis: The explosive yield and mb (size/effect of the explosion) are the same across different countries
+
+Alternative Hypothesis: The explosive yield and mb (size/effect of the explosion) differ across different countries
+
+Based on this hypothesis, we f reject the null hypothesis that all of the countries have the same impact on seismic magnitudes 
+
+#   Linear Regression
+```{R}
+
+nuke1$latitude<-nuke1$latitude-mean(nuke1$latitude)
+nuke1$longitude<-nuke1$longitude-mean(nuke1$longitude)
+
+fit<-lm(mb~latitude+longitude, data = nuke1)
+summary(fit)
+
+ggplot(nuke1,aes(y=longitude,x=latitude,color=mb))+geom_point()+stat_smooth(method="lm",se=FALSE)
+
+
+ggplot(nuke1,aes(y=mb,x=longitude))+geom_point()+stat_smooth(method="lm",se=FALSE) #mb for every 1 unit Longitude 
+ggplot(nuke1,aes(y=mb,x=latitude))+geom_point()+stat_smooth(method="lm",se=FALSE) #mb for every 1 unit Latitude 
+
+
+qqnorm(nuke1$latitude)
+qqnorm(nuke1$longitude)
+
+summary(fit)$r.sq
+
+library(lmtest)
+library(sandwich)
+bptest(fit)
+coeftest(fit, vcov = vcovHC(fit)) 
+
+
+ffit<-lm(mb~latitude, data = nuke1) #effect of latitude
+summary(ffit)
+
+
+fffit<-lm(mb~longitude, data = nuke1) #effect of latitude
+summary(fffit)
+
+```
+It was observed that for every one unit increase in magnitude (mb), Latitude decreases by 0.0006860 (p= 0.6208) while longitude increased by 0.0007708 (p=0.0546 ). The bp test returned a p value of 0.009053 which indicates that heteroscedasticity does not exist. The chi sq test revealed that this model accounts for 0.008265783 of the total variation. Based on this data we fail to reject the null hypothesis that that long/lat affect the seismic magnitude of an explosion.
+
+
+#   Linear Regression (With Interaction)
+```{R} 
+
+newnuke1<-nuke1 %>% select(mb, longitude,latitude)
+view(newnuke1)
+
+fitt<-lm(mb~latitude*longitude, data = newnuke1)
+sd1<-newnuke1[sample(nrow(newnuke1),replace=TRUE),]
+
+sample_dist<-replicate(1000, {
+  sd1<-newnuke1[sample(nrow(newnuke1),replace=TRUE),]
+  fittt<-lm(mb~latitude*longitude,data=sd1)
+  coef(fittt)
+  })
+
+summary(fitt)#uncorrected
+
+coeftest(fitt, vcov = vcovHC(fitt))#corrected
+
+```
+It was observed that the p values and the Std. Error for the uncorected SE's are higher than the values for the corrected SE's.
+
+#   Logistic Regression Model
+```{R}
+
+library(plotROC)
+
+nuke1$Binary<-ifelse(nuke1$country=="USA",1,0)
+glimpse(nuke1)
+
+fittt<-glm(Binary~year+yield_1, data = nuke1, family="binomial")
+coeftest(fittt)
+
+exp(coef(fittt))
+
+
+nuke1$probability<-predict(fittt,type="response")
+
+table(predict= as.numeric(nuke1$probability>0.5), truth = nuke1$Binary) %>% addmargins()
+
+#TNR = 0.9228395
+299/324
+
+#TPR = 0.06060606
+10/165
+
+#PPV = 0.6585903
+299/454
+
+
+
+pca1<-princomp(nuke1[c('year','mb')])
+nuke1$predictor<-pca1$scores[,1]
+ggplot(nuke1, aes(predictor,probability))+geom_point(aes(color=country),alpha=.5,size=4) 
+
+
+ggplot(nuke1)+geom_density(aes(probability,fill=Binary))+xlab("logit") #Density Plot (Log odds x Binary)
+
+
+
+sens<-function(p,data=nuke1, y=Binary) mean(nuke1[nuke1$Binary==1,]$probability>p)
+spec<-function(p,data=nuke1, y=Binary) mean(nuke1[nuke1$Binary==0,]$probability<p)
+
+sensitivity<-sapply(seq(0,1,.01),sens,nuke1)
+specificity<-sapply(seq(0,1,.01),spec,nuke1)
+ROC1<-data.frame(sensitivity,specificity,cutoff=seq(0,1,.01)) 
+ROC1%>%gather(key,rate,-cutoff)%>%ggplot(aes(cutoff,rate,color=key))+geom_path()+  geom_vline(xintercept=c(.1,.5),lty=2,color="gray50")
+
+
+ROC1$TPR<-sensitivity
+ROC1$FPR<-1-specificity
+ROC1%>%ggplot(aes(FPR,TPR))+geom_path(size=1.5)+geom_segment(aes(x=0,y=0,xend=1,yend=1),lty=2)+  scale_x_continuous(limits = c(0,1))
+
+
+ROCplot<-ggplot(nuke1)+geom_roc(aes(d=Binary,m=predictor), n.cuts=0) 
+calc_auc(ROCplot) 
+
+
+
+class_diag<-function(probs,truth){
+  
+  tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+  
+  #CALCULATE EXACT AUC
+  ord<-order(probs, decreasing=TRUE)
+  probs <- probs[ord]; truth <- truth[ord]
+  
+  TPR=cumsum(truth)/max(1,sum(truth)) 
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  
+  dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+  TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+  
+  n <- length(TPR)
+  auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+  data.frame(acc,sens,spec,ppv,auc)
+}
+
+k=10
+data1<-nuke1[sample(nrow(nuke1)),]
+folds<-cut(seq(1:nrow(nuke1)),breaks=k,labels=F)
+
+diags<-NULL 
+for(i in 1:k){
+  train<-data1[folds!=i,]   
+  test<-data1[folds==i,]
+  truth<-test$Binary
+  fit5<-glm(Binary~year+yield_1,data=nuke1,family="binomial")
+  probs<-predict(fit5,newdata = test,type="response")
+  diags<-rbind(diags,class_diag(probs,truth)) 
+}
+
+apply(diags,2,mean)
+
+#   acc       sens       spec        ppv        auc 
+#0.63201531 0.92326200 0.06015146 0.65858885 0.64767851 
+
+
+```
+The TNR was found to be 0.9228395 and the TPR was 0.06060606. These values indicate that the madel wad fairly good at indicating wether or not the origin of the bomb was the USA. The PPV was found to be 0.6585903 which is the proportion of the data that was correctly predicted to be from the 'USA'. 
+The AUC value was found to be 0.64767851 which means the model is 'fair' at predicting the that the bomb was from the USA.The calculated values for accuracy, sensitivity , specificity, ppv and auc are all as shown below.
+
+#acc       sens       spec        ppv        auc 
+#0.63201531 0.92326200 0.06015146 0.65858885 0.64767851 
+
+
+
+#   LASSO Regression
+```{R}
+library(glmnet)
+fit6<-glm(Binary~mb+yield_1+latitude+longitude, data = nuke1, family = binomial)
+
+x<-model.matrix(fit6)
+y<-as.matrix(nuke1$Binary)
+
+cv<-cv.glmnet(x,y,family = 'binomial')
+lasso<-glmnet(x,y,family = 'binomial',lambda=cv$lambda.1se)
+coef(lasso)
+
+
+
+prob11<-predict(lasso, newx = x, type = "response")
+class_diag(prob11, nuke1$Binary)
+
+#acc=0.9406953
+#sens=0.9753086	
+#spec=0.8727273	
+#ppv=0.9376855	
+#auc=0.9089693
+
+k=10
+data2<-nuke1[sample(nrow(nuke1)),]
+folds2<-cut(seq(1:nrow(nuke1)),breaks=k,labels=F)
+
+diags<-NULL 
+for(i in 1:k){
+  train<-data2[folds2!=i,]   
+  test<-data2[folds2==i,]
+  truth<-test$Binary
+  fit<-glm(Binary~mb+yield_1+latitude+longitude,data=train,family="binomial")
+  probs12<-predict(fit,newdata = test,type="response")
+  diags<-rbind(diags,class_diag(probs12,truth)) 
+}
+
+apply(diags,2,mean)
+    # acc      sens      spec       ppv       auc 
+#0.9366497 0.9722831 0.8559121 0.9296818 0.9040297 
+summary(fit6)
+#Residual deviance: 272.67
+```
+The longitude,latitude,mb, and yield_1 variables were retained. The accuracy, specificity, sensitivity ,ppv, ad AUC are all higher when compared to the logistic regression. The model was found to have a Null deviance of 625.25 and a residual standard error of 272.67
+
+
+```{R}
+
+
+```
+
+<P style="page-break-before: always">
+\newpage
+
+
+
+
+...
+
+
