@@ -8,14 +8,12 @@
     <language>en-US</language>
     <lastBuildDate>Sun, 09 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Blog Post</title>
+      <title>Blog Post (Python)</title>
       <link>/post/2021/05/09/blog-post/</link>
       <pubDate>Sun, 09 May 2021 00:00:00 +0000</pubDate>
       
       <guid>/post/2021/05/09/blog-post/</guid>
-      <description>it worked i guess
-Link to project 1
-Link to google</description>
+      <description>R studio and Python work hand-in-hand in order to bring you tons of availible packages to install. One that I have found to be super useful is the dplyr package in r (dfply for python). This package gives you the ability to pipe commands together without changing the source code.This allows you to clean up the dataset in order to further examine and draw conclusions. You can use reticulate in order to embed a python session or piping into your R session.</description>
     </item>
     
     <item>

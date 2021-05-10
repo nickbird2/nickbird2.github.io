@@ -1,5 +1,5 @@
 ---
-title: Blog Post
+title: "Blog Post (Python)"
 author: ''
 date: '2021-05-09'
 slug: blog-post
@@ -7,7 +7,26 @@ categories: []
 tags: []
 description: ''
 ---
-it worked i guess
+R studio and Python work hand-in-hand in order to bring you tons of availible packages to install. One that I have found to be super useful is the dplyr package in r (dfply for python). This package gives you the ability to pipe commands together without changing the source code.This allows you to clean up the dataset in order to further examine and draw conclusions. You can use reticulate in order to embed a python session or piping into your R session.
+```{R}
+library(dplyr)
+
+females <- c(0.291, 0.208, 0.241, 0.437, 0.228, 0.256, 0.208, 0.234, 0.320, 0.340, 0.150 )
+
+males <- c(0.185, 0.222, 0.149, 0.187, 0.191, 0.219, 0.132, 0.144, 0.140)
+
+logfem <- log(females)
+logmale <- log(males)
+
+mean(logfem) - mean(logmale)
+
+t.test(logfem, logmale)
+#
+
+females %>% mean()
+males %>% mean()
+```
+
 
 
 [Link to project 1](/project/project1/)

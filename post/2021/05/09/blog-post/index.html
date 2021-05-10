@@ -7,7 +7,7 @@
     <meta name="author" content="Nicholaus Bird" />
     
     <link rel="shortcut icon" type="image/x-icon" href="../../../../../img/favicon.ico">
-    <title>Blog Post</title>
+    <title>Blog Post (Python)</title>
     <meta name="generator" content="Hugo 0.83.1" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="../../../../../css/main.css" />
@@ -54,7 +54,7 @@
       <div class="container">
         <div class="blog-post">
           <h3>
-            <strong><a href="../../../../../post/2021/05/09/blog-post/">Blog Post</a></strong>
+            <strong><a href="../../../../../post/2021/05/09/blog-post/">Blog Post (Python)</a></strong>
           </h3>
         </div>
  
@@ -72,7 +72,43 @@
               
 
 
-<p>it worked i guess</p>
+<p>R studio and Python work hand-in-hand in order to bring you tons of availible packages to install. One that I have found to be super useful is the dplyr package in r (dfply for python). This package gives you the ability to pipe commands together without changing the source code.This allows you to clean up the dataset in order to further examine and draw conclusions. You can use reticulate in order to embed a python session or piping into your R session.</p>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>females &lt;- c(0.291, 0.208, 0.241, 0.437, 0.228, 0.256, 0.208, 0.234, 0.320, 0.340, 0.150 )
+
+males &lt;- c(0.185, 0.222, 0.149, 0.187, 0.191, 0.219, 0.132, 0.144, 0.140)
+
+logfem &lt;- log(females)
+logmale &lt;- log(males)
+
+mean(logfem) - mean(logmale)</code></pre>
+<pre><code>## [1] 0.3972453</code></pre>
+<pre class="r"><code>t.test(logfem, logmale)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  logfem and logmale
+## t = 3.6469, df = 17.544, p-value = 0.00191
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.1679745 0.6265160
+## sample estimates:
+## mean of x mean of y 
+## -1.366767 -1.764012</code></pre>
+<pre class="r"><code>#
+
+females %&gt;% mean()</code></pre>
+<pre><code>## [1] 0.2648182</code></pre>
+<pre class="r"><code>males %&gt;% mean()</code></pre>
+<pre><code>## [1] 0.1743333</code></pre>
 <p><a href="../../../../../project/project1/">Link to project 1</a></p>
 <p><a href="https://www.google.com">Link to google</a></p>
 
